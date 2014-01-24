@@ -33,12 +33,15 @@ function openid_network_admin_panels() {
  * @action: load-openid_network_settings
  **/
 function openid_save_network_options() {
-	if (array_key_exists('openid_cap', $_POST)) {
-		openid_set_cap($_POST['openid_cap'], null);
-	}
+	if (!empty($_POST))
+	{
+		if (array_key_exists('openid_cap', $_POST)) {
+			openid_set_cap($_POST['openid_cap'], null);
+		}
 
-	$anyone = array_key_exists('openid_anyone', $_POST);
-	update_site_option('openid_anyone', $anyone? '1' : '0');
+		$anyone = array_key_exists('openid_anyone', $_POST);
+		update_site_option('openid_anyone', $anyone? '1' : '0');
+	}
 }
 
 /**
@@ -299,7 +302,11 @@ function openid_options_page() {
 			<?php
 				endif; //!OPENID_NETWORK_WIDE_CONFIG || !$isNetworkPanel
 				settings_fields('openid');
+				/* All options might be checkboxes and there's a chance the post will
+				 * be empty and updating the settings will fail if there's no hidden
+				 * field. */
 			?>
+			<input type="hidden" name="openid_post_not_empty" value="1">
 			<p class="submit"><input type="submit" class="button-primary" name="info_update" value="<?php _e('Save Changes') ?>" /></p>
 		</form>
 	</div>
