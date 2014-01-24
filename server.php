@@ -27,6 +27,7 @@ function openid_provider_xrds_simple($xrds) {
 	global $wp_roles;
 
 	if (!$wp_roles) $wp_roles = new WP_Roles();
+	$anyone = OPENID_NETWORK_WIDE_CONFIG? get_site_option('openid_anyone') : get_option('openid_anyone');
 
 	$provider_enabled = false;
 	foreach ($wp_roles->role_names as $key => $name) {
@@ -37,7 +38,7 @@ function openid_provider_xrds_simple($xrds) {
 		}
 	}
 
-	if (!$provider_enabled) return $xrds;
+	if (!$anyone && !$provider_enabled) return $xrds;
 
 
 	$user = openid_server_requested_user();
@@ -62,7 +63,6 @@ function openid_provider_xrds_simple($xrds) {
 	if ($user) {
 		// if user doesn't have capability, bail
 		$user_object = new WP_User($user->ID);
-		if (!$user_object->has_cap('use_openid_provider')) return $xrds;
 
 		if (get_user_meta($user->ID, 'openid_delegate', true)) {
 			$services = get_user_meta($user->ID, 'openid_delegate_services', true);
@@ -209,7 +209,8 @@ function openid_server_auth_request($request) {
 	$id_select = ($request->identity == 'http://specs.openid.net/auth/2.0/identifier_select');
 
 	// bail if user does not have access to OpenID provider
-	if (!$user->has_cap('use_openid_provider')) return $request->answer(false);
+	$anyone = OPENID_NETWORK_WIDE_CONFIG? get_site_option('openid_anyone') : get_option('openid_anyone');
+	if (!$anyone && !$user->has_cap('use_openid_provider')) return $request->answer(false);
 
 	// bail if user doesn't own identity and not using id select
 	if (!$id_select && ($author_url != $request->identity)) {
@@ -353,7 +354,8 @@ function openid_provider_link_tags() {
 	if ( isset($user) && $user) {
 		// if user doesn't have capability, bail
 		$user_object = new WP_User($user->ID);
-		if (!$user_object->has_cap('use_openid_provider')) return;
+		$anyone = OPENID_NETWORK_WIDE_CONFIG? get_site_option('openid_anyone') : get_option('openid_anyone');
+		if (!$anyone && !$user_object->has_cap('use_openid_provider')) return;
 
 		if (get_user_meta($user->ID, 'openid_delegate', true)) {
 			$services = get_user_meta($user->ID, 'openid_delegate_services', true);

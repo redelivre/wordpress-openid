@@ -36,6 +36,9 @@ function openid_save_network_options() {
 	if (array_key_exists('openid_cap', $_POST)) {
 		openid_set_cap($_POST['openid_cap'], null);
 	}
+
+	$anyone = array_key_exists('openid_anyone', $_POST);
+	update_site_option('openid_anyone', $anyone? '1' : '0');
 }
 
 /**
@@ -105,6 +108,7 @@ function openid_admin_register_settings() {
 	register_setting('openid', 'openid_blog_owner');
 	if (!OPENID_NETWORK_WIDE_CONFIG) {
 		register_setting('openid', 'openid_cap');
+		register_setting('openid', 'openid_anyone');
 	}
 }
 
@@ -212,7 +216,11 @@ function openid_options_page() {
 					$option_name = 'openid_cap[' . htmlentities($key) . ']';
 					echo '<input type="checkbox" id="'.$option_name.'" name="'.$option_name.'"'.$checked.' /><label for="'.$option_name.'"> '.$name.'</label><br />' . "\n";
 				}
+				$anyone = OPENID_NETWORK_WIDE_CONFIG? get_site_option('openid_anyone') : get_option('openid_anyone');
 							?>
+								<input type="checkbox" id="openid_anyone" name="openid_anyone"
+									<?php if ($anyone) echo 'checked="checked"'; ?> />
+								<label for="openid_anyone"><? _e('Anyone', 'openid'); ?></label>
 						</p>
 					</td>
 				</tr>
