@@ -938,6 +938,8 @@ function openid_profile_update($user_id) {
 function openid_profile_update_errors($errors, $update, $user) {
 	global $openid_user_delegation_info;
 
+	if(!array_key_exists('openid_delegate', $_POST)) return $errors;
+	 
 	$delegate = Auth_OpenID::normalizeUrl($_POST['openid_delegate']);
 	if ( empty($delegate) ) return $errors;
 
