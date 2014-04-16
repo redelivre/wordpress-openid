@@ -58,10 +58,13 @@ function openid_admin_panels() {
 	add_action("load-$hookname", 'openid_style');
 	
 	// all users can setup external OpenIDs
-	$hookname =	add_users_page(__('Your OpenIDs', 'openid'), __('Your OpenIDs', 'openid'), 'read', 'your_openids', 'openid_profile_panel' );
-	add_action("load-$hookname", create_function('', 'wp_enqueue_script("admin-forms");'));
-	add_action("load-$hookname", 'openid_profile_management' );
-	add_action("load-$hookname", 'openid_style' );
+	if(OPENID_ENABLE_CONSUMER)
+	{ 
+		$hookname =	add_users_page(__('Your OpenIDs', 'openid'), __('Your OpenIDs', 'openid'), 'read', 'your_openids', 'openid_profile_panel' );
+		add_action("load-$hookname", create_function('', 'wp_enqueue_script("admin-forms");'));
+		add_action("load-$hookname", 'openid_profile_management' );
+		add_action("load-$hookname", 'openid_style' );
+	}
 
 	// additional options for users authorized to use OpenID provider
 	$user = wp_get_current_user();
